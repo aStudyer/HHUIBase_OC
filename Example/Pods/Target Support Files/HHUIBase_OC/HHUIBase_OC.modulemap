@@ -1,0 +1,6 @@
+framework module HHUIBase_OC {
+  umbrella header "HHUIBase_OC-umbrella.h"
+
+  export *
+  module * { export * }
+}

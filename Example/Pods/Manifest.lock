@@ -1,0 +1,23 @@
+PODS:
+  - HHUIBase_OC (0.1.0):
+    - MJExtension
+  - MJExtension (3.1.0)
+
+DEPENDENCIES:
+  - HHUIBase_OC (from `../`)
+
+SPEC REPOS:
+  https://github.com/cocoapods/specs.git:
+    - MJExtension
+
+EXTERNAL SOURCES:
+  HHUIBase_OC:
+    :path: "../"
+
+SPEC CHECKSUMS:
+  HHUIBase_OC: 45d5934ecee45f15b720c7c3e7a9edc10193b7a9
+  MJExtension: 6b69b3bef2864fd550ce1a184eda219e321209d2
+
+PODFILE CHECKSUM: 09e478acb012ef28369046baafc005981409d00b
+
+COCOAPODS: 1.7.5

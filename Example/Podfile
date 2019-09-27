@@ -1,0 +1,13 @@
+use_frameworks!
+
+platform :ios, '8.0'
+
+target 'HHUIBase_OC_Example' do
+  pod 'HHUIBase_OC', :path => '../'
+
+  target 'HHUIBase_OC_Tests' do
+    inherit! :search_paths
+
+    
+  end
+end
