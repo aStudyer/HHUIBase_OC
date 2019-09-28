@@ -36,9 +36,10 @@
 }
 
 - (void)setDataList:(NSArray<TableSectionModel *> *)dataList{
-    [dataList enumerateObjectsUsingBlock:^(TableSectionModel * _Nonnull section_model, NSUInteger idx, BOOL * _Nonnull stop) {
-        [section_model.items enumerateObjectsUsingBlock:^(TableRowModel * _Nonnull row_model, NSUInteger idx, BOOL * _Nonnull stop) {
-            row_model.indexPath = [NSIndexPath indexPathForRow:idx inSection:section_model.section];
+    [dataList enumerateObjectsUsingBlock:^(TableSectionModel * _Nonnull sectionItem, NSUInteger sectionIndex, BOOL * _Nonnull stop) {
+        sectionItem.section = sectionIndex;
+        [sectionItem.items enumerateObjectsUsingBlock:^(TableRowModel * _Nonnull rowItem, NSUInteger rowIndex, BOOL * _Nonnull stop) {
+            rowItem.indexPath = [NSIndexPath indexPathForRow:rowIndex inSection:sectionIndex];
         }];
     }];
     _dataList = dataList;
@@ -52,7 +53,6 @@
 
 - (NSInteger)tableView:(UITableView *)tableView numberOfRowsInSection:(NSInteger)section{
     TableSectionModel *sectionModel = self.dataList[section];
-    sectionModel.section = section;
     return sectionModel.isOpened ? sectionModel.items.count : 0;
 }
 
@@ -61,7 +61,6 @@
     
     TableSectionModel *sectionModel = self.dataList[indexPath.section];
     TableRowModel *rowModel = sectionModel.items[indexPath.row];
-    rowModel.indexPath = indexPath;
     
     cell.data = rowModel;
     
@@ -73,20 +72,9 @@
     [tableView deselectRowAtIndexPath:indexPath animated:true];
     TableSectionModel *sectionModel = self.dataList[indexPath.section];
     TableRowModel *rowModel = sectionModel.items[indexPath.row];
-    rowModel.indexPath = indexPath;
     
     if (rowModel.destVC.length) {
-        UIViewController *destVC = nil;
-        @try {
-            destVC = [UIStoryboard storyboardWithName:rowModel.destVC bundle:nil].instantiateInitialViewController;
-        } @catch (NSException *exception) {
-            destVC = [[NSClassFromString(rowModel.destVC) alloc] init];
-        } @finally {
-            if (destVC) {
-                destVC.title = rowModel.title;
-                [self.navigationController pushViewController:destVC animated:YES];
-            }
-        }
+        [self jumpToDestVC:rowModel.destVC title:rowModel.title];
     }else if (rowModel.operation){
         rowModel.operation(tableView, indexPath);
     }
@@ -102,17 +90,7 @@
             __strong typeof(weakself) self = weakself;
             TableSectionModel *sectionModel = self.dataList[section];
             if (sectionModel.destVC.length) {
-                UIViewController *destVC = nil;
-                @try {
-                    destVC = [UIStoryboard storyboardWithName:sectionModel.destVC bundle:nil].instantiateInitialViewController;
-                } @catch (NSException *exception) {
-                    destVC = [[NSClassFromString(sectionModel.destVC) alloc] init];
-                } @finally {
-                    if (destVC) {
-                        destVC.title = sectionModel.header;
-                        [self.navigationController pushViewController:destVC animated:YES];
-                    }
-                }
+                [self jumpToDestVC:sectionModel.destVC title:sectionModel.header];
             }else if (sectionModel.operation) {
                 sectionModel.operation(tableView, section);
             }else {
@@ -149,6 +127,18 @@
 - (CGFloat)tableView:(UITableView *)tableView heightForFooterInSection:(NSInteger)section{
     TableSectionModel *sectionModel = self.dataList[section];
     return sectionModel.footer.length ? 40 : CGFLOAT_MIN;
+}
+
+#pragma mark - Utils
+- (void)jumpToDestVC:(NSString *)destVC title:(NSString *)title{
+    UIViewController *destViewController = nil;
+    if ([[NSBundle mainBundle] pathForResource:destVC ofType:@"storyboard"]) {
+        destViewController = [UIStoryboard storyboardWithName:destVC bundle:nil].instantiateInitialViewController;
+    }else{
+        destViewController = [[NSClassFromString(destVC) alloc] init];
+    }
+    destViewController.title = title;
+    [self.navigationController pushViewController:destViewController animated:YES];
 }
 
 @end

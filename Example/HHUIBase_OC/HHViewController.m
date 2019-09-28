@@ -30,12 +30,8 @@
                 break;
         }
         [obj.items enumerateObjectsUsingBlock:^(TableRowModel * _Nonnull obj, NSUInteger idx, BOOL * _Nonnull stop) {
-            NSLog(@"section = %zd --- row = %zd",obj.indexPath.section, obj.indexPath.row);
             switch (obj.indexPath.section) {
                 case 0:
-                    if (1 == obj.indexPath.row) {
-                        NSLog(@"来了");
-                    }
                     switch (obj.indexPath.row) {
                         case 1:
                             obj.operation = ^(UITableView * _Nonnull tableView, NSIndexPath * _Nonnull indexPath) {
