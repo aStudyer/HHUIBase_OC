@@ -28,6 +28,25 @@
         self.dataList = [TableSectionModel mj_objectArrayWithFilename:fileName];
     }
     
+    [self.dataList enumerateObjectsUsingBlock:^(TableSectionModel * _Nonnull sectionItem, NSUInteger sectionIndex, BOOL * _Nonnull stop) {
+        NSString *sectionSelectorName = [NSString stringWithFormat:@"section_%02zd:",sectionIndex];
+        SEL sectionSelector = NSSelectorFromString(sectionSelectorName);
+        if ([self respondsToSelector:sectionSelector]) {
+            [self performSelectorOnMainThread:NSSelectorFromString(sectionSelectorName) withObject:sectionItem waitUntilDone:NO];
+        }else{
+            NSLog(@"尚未实现方法:%@",sectionSelectorName);
+        }
+        [sectionItem.items enumerateObjectsUsingBlock:^(TableRowModel * _Nonnull rowItem, NSUInteger rowIndex, BOOL * _Nonnull stop) {
+            NSString *rowSelectorName = [NSString stringWithFormat:@"row_%02zd_%02zd:",sectionIndex, rowIndex];
+            SEL rowSelector = NSSelectorFromString(rowSelectorName);
+            if ([self respondsToSelector:rowSelector]) {
+                [self performSelectorOnMainThread:NSSelectorFromString(rowSelectorName) withObject:rowItem waitUntilDone:NO];
+            }else{
+                NSLog(@"尚未实现方法:%@",rowSelectorName);
+            }
+        }];
+    }];
+    
     NSLog(@"Welcome to %@", NSStringFromClass(self.class));
 }
 
@@ -38,9 +57,15 @@
 - (void)setDataList:(NSArray<TableSectionModel *> *)dataList{
     [dataList enumerateObjectsUsingBlock:^(TableSectionModel * _Nonnull sectionItem, NSUInteger sectionIndex, BOOL * _Nonnull stop) {
         sectionItem.section = sectionIndex;
+        NSMutableArray *items = [NSMutableArray arrayWithArray:sectionItem.items];
         [sectionItem.items enumerateObjectsUsingBlock:^(TableRowModel * _Nonnull rowItem, NSUInteger rowIndex, BOOL * _Nonnull stop) {
-            rowItem.indexPath = [NSIndexPath indexPathForRow:rowIndex inSection:sectionIndex];
+            if (!rowItem.title.length) {
+                [items removeObject:rowItem];
+            }else{
+                rowItem.indexPath = [NSIndexPath indexPathForRow:rowIndex inSection:sectionIndex];
+            }
         }];
+        sectionItem.items = items;
     }];
     _dataList = dataList;
     [self.tableView reloadData];
