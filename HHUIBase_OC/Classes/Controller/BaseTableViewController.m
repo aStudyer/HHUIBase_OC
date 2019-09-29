@@ -32,7 +32,13 @@
         NSString *sectionSelectorName = [NSString stringWithFormat:@"section_%02zd:",sectionIndex];
         SEL sectionSelector = NSSelectorFromString(sectionSelectorName);
         if ([self respondsToSelector:sectionSelector]) {
-            [self performSelectorOnMainThread:NSSelectorFromString(sectionSelectorName) withObject:sectionItem waitUntilDone:NO];
+            __weak typeof(self) weakself = self;
+            sectionItem.operation = ^(UITableView * _Nonnull tableView, NSInteger section) {
+                __strong typeof(weakself) self = weakself;
+                NSString *sectionSelectorName = [NSString stringWithFormat:@"section_%02zd:",sectionIndex];
+                SEL sectionSelector = NSSelectorFromString(sectionSelectorName);
+                [self performSelectorOnMainThread:NSSelectorFromString(sectionSelectorName) withObject:self.dataList[section] waitUntilDone:NO];
+            };
         }else{
             NSLog(@"尚未实现方法:%@",sectionSelectorName);
         }
@@ -40,7 +46,13 @@
             NSString *rowSelectorName = [NSString stringWithFormat:@"row_%02zd_%02zd:",sectionIndex, rowIndex];
             SEL rowSelector = NSSelectorFromString(rowSelectorName);
             if ([self respondsToSelector:rowSelector]) {
-                [self performSelectorOnMainThread:NSSelectorFromString(rowSelectorName) withObject:rowItem waitUntilDone:NO];
+                __weak typeof(self) weakself = self;
+                rowItem.operation = ^(UITableView * _Nonnull tableView, NSIndexPath * _Nonnull indexPath) {
+                    __strong typeof(weakself) self = weakself;
+                    NSString *rowSelectorName = [NSString stringWithFormat:@"row_%02zd_%02zd:",sectionIndex, rowIndex];
+                    SEL rowSelector = NSSelectorFromString(rowSelectorName);
+                    [self performSelectorOnMainThread:rowSelector withObject:self.dataList[indexPath.section].items[indexPath.row] waitUntilDone:NO];
+                };
             }else{
                 NSLog(@"尚未实现方法:%@",rowSelectorName);
             }

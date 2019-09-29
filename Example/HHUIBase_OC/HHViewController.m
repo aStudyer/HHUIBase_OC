@@ -22,16 +22,12 @@
 
 #pragma mark - Header Methods
 - (void)section_02:(TableSectionModel *)sectionItem {
-    sectionItem.operation = ^(UITableView * _Nonnull tableView, NSInteger section) {
-        NSLog(@"执行操作中...");
-    };
+    NSLog(@"执行操作中...");
 }
 
 #pragma mark - Cell Methods
 - (void)row_00_01:(TableRowModel *)rowItem {
-    rowItem.operation = ^(UITableView * _Nonnull tableView, NSIndexPath * _Nonnull indexPath) {
-        NSLog(@"点我执行操作...");
-    };
+    NSLog(@"点我执行操作...");
 }
 
 @end
